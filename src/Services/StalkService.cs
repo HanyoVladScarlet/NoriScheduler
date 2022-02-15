@@ -1,4 +1,6 @@
-﻿namespace NoriScheduler.Services;
+﻿using Serilog;
+
+namespace NoriScheduler.Services;
 
 internal class StalkService
 {
@@ -28,12 +30,18 @@ internal class StalkService
         // 从远端获得json文本
         var input = await _webService.GetAsync();
 
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            Log.Error("从远端返回为空的数据，获取api失败。");
+            return;
+        }
+
         // 生成txt文件
         var text = _jsonParseService.ParseText(input);
         _fileService.CreateText(text);
 
         // 生成markdown文件
         text = _jsonParseService.ParseMarkdown(input);
-        _fileService.CreateMarkdown(text);
+        _fileService.CreatePdf(text);
     }
 }

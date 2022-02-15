@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using System.Text;
+using Aspose.Html.Saving;
 
 namespace NoriScheduler.Services;
 
@@ -52,6 +53,31 @@ internal class FileService
             Log.Error("生成txt文件失败...");
             Log.Error(e.Message);
         }
+    }
+
+    /// <summary>
+    /// 使用pdf对markdown文件进行预览
+    /// </summary>
+    public void CreatePdf(string input)
+    {
+        try
+        {
+            var path = NoriScheduleConfiguration.PdfOutputPath;
+            
+            CreateMarkdown(input);
+            var document = Aspose.Html.Converters
+                .Converter.ConvertMarkdown(NoriScheduleConfiguration.MarkdownOutputPath);
+            Aspose.Html.Converters.Converter.ConvertHTML(document,
+                new PdfSaveOptions(), path);
+            Log.Information("已生成pdf文件：" +
+                        "{0}！", path);
+        }
+        catch (Exception e)
+        {
+            Log.Error("生成pdf文件失败...");
+            Log.Error(e.Message);
+        }
+        
     }
 }
 

@@ -1,9 +1,12 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 
+using System;
+using System.Linq;
 using NoriScheduler.Services;
 using Serilog;
 using System.Reflection;
+using System.Threading.Tasks;
 
 #region Init
 
@@ -13,8 +16,8 @@ Log.Logger = new LoggerConfiguration()
     .Console()
     .CreateLogger();
 
-Log.Information($"NoriScheduler Runs at version {0}",
-    Assembly.GetExecutingAssembly().GetName().Version);
+//Log.Information($"NoriScheduler Runs at version {0}",
+    //Assembly.GetExecutingAssembly().GetName().Version);
 #endregion
 
 await Output();

@@ -22,9 +22,16 @@ internal class WebService
             var res = await client.GetAsync(url);
 
             // 若状态码正常，则返回得到的json文本
-            if (res.StatusCode != HttpStatusCode.OK)
+            if (res.StatusCode == HttpStatusCode.OK)
             {
-                return await res.Content.ReadAsStringAsync();
+                var text = await res.Content.ReadAsStringAsync();
+#if DEBUG
+                Console.WriteLine();
+                Console.WriteLine("从远端api获得的结果如下：");
+                Console.WriteLine(text);
+                Console.WriteLine();
+#endif
+                return text;
             }
             Log.Error("位于：{0} 的Api获取失败，" +
                       "状态码为：{1}，请检查网络情况或更换代理！",

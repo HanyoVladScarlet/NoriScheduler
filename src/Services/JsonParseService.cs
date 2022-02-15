@@ -53,12 +53,30 @@ internal class JsonParseService
                 .Append(idol.Mark)
                 .Append("you");
 
-            if (video.members != null)
+            var isCoopLive = video.members != null
+                             || NoriScheduleConfiguration
+                                 .CoopKeys
+                                 .FirstOrDefault(x=>
+                                     title.ToLower().Contains(x)) != null;
+
+            if (isCoopLive)
             {
                 Log.Warning("检测到于 {0} 播出的节目" +
-                            "{1}存在联动对象，请手动添加！",
+                            "{1}可能存在联动对象，请手动检查！",
                     time, title);
                 sb.Append("（联动对象：【】）");
+            }
+
+            var isVideoUpload = NoriScheduleConfiguration
+                .VideoUploadKeys.FirstOrDefault(x =>
+                    title.ToLower().Contains(x))!= null;
+
+            if (isVideoUpload)
+            {
+                Log.Warning("检测到于 {0} 播出的节目" +
+                            "{1}可能是视频投稿，请手动检查！",
+                    time, title);
+                sb.Append("（视频投稿）");
             }
 
             sb.AppendLine();
@@ -84,10 +102,10 @@ internal class JsonParseService
                       "\n}\n</style>\n");
 
         // 标题
-        sb.AppendLine($"🌞～本日{DateTime.Now.Month}/" +
+        sb.AppendLine($"# 🌞～本日{DateTime.Now.Month}/" +
                       $"{DateTime.Now.Day}的直播预告～🌞")
             .AppendLine()
-            .AppendLine($"官网链接：https://schedule.noripro.jp/");
+            .AppendLine($"## 官网链接：https://schedule.noripro.jp/");
 
         foreach (var video in videos)
         {
@@ -116,16 +134,26 @@ internal class JsonParseService
             // 直播间标题
             string title = video.title.ToString();
 
+            // 判断是否为视频投稿
+            var isVideoUpload = NoriScheduleConfiguration
+                .VideoUploadKeys.FirstOrDefault(x =>
+                    title.ToLower().Contains(x)) != null;
+
             // 直播时间
             DateTime dateTime = GetLocalTime(video.timestamp.ToString());
 
             sb.AppendLine("---")
+                .Append("## 直播时间：")
                 .AppendLine(dateTime
                     .ToString(CultureInfo.CurrentCulture))
+                .AppendLine()
                 .AppendLine($"![](https://i.ytimg.com/vi/" +
                             $"{liveId}/{thumbNail})")
+                .AppendLine()
                 .AppendLine(title)
-                .AppendLine(url)
+                .AppendLine()
+                .AppendLine((isVideoUpload?
+                    "视频地址：":"直播地址：")+ url)
                 .AppendLine();
         }
 
